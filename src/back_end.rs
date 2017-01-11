@@ -49,39 +49,20 @@ impl Colored {
 
         let src = |bytes| unsafe { ::std::str::from_utf8_unchecked(bytes) };
 
-        let vertex_shader = match if cfg!(target_os = "emscripten") {
-            compile_shader(gl::VERTEX_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(colored::VERTEX_GLSL_120_WEBGL))
-                               .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE_WEBGL))
-                               .get(glsl)
-                               .unwrap())
-        } else {
-            compile_shader(gl::VERTEX_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
-                               .set(GLSL::V1_50, src(colored::VERTEX_GLSL_150_CORE))
-                               .get(glsl)
-                               .unwrap())
-        } {
+
+        let vertex_shader = match compile_shader(
+            gl::VERTEX_SHADER,                  // shader type
+            Shaders::new().set(GLSL::V1_20, src(colored::VERTEX_GLSL_120))
+                          .get(glsl).unwrap()
+        ) {
             Ok(id) => id,
             Err(s) => panic!("compile_shader: {}", s),
         };
-        let fragment_shader = match if cfg!(target_os = "emscripten") {
-            compile_shader(gl::FRAGMENT_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120_WEBGL))
-                               .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE_WEBGL))
-                               .get(glsl)
-                               .unwrap())
-        } else {
-            compile_shader(gl::FRAGMENT_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
-                               .set(GLSL::V1_50, src(colored::FRAGMENT_GLSL_150_CORE))
-                               .get(glsl)
-                               .unwrap())
-        } {
+        let fragment_shader = match compile_shader(
+            gl::FRAGMENT_SHADER,                // shader type
+            Shaders::new().set(GLSL::V1_20, src(colored::FRAGMENT_GLSL_120))
+                          .get(glsl).unwrap()
+        ) {
             Ok(id) => id,
             Err(s) => panic!("compile_shader: {}", s),
         };
@@ -91,12 +72,6 @@ impl Colored {
             program = gl::CreateProgram();
             gl::AttachShader(program, vertex_shader);
             gl::AttachShader(program, fragment_shader);
-
-            let c_o_color = CString::new("o_Color").unwrap();
-            if cfg!(not(target_os = "emscripten")) {
-                gl::BindFragDataLocation(program, 0, c_o_color.as_ptr());
-            }
-            drop(c_o_color);
         }
 
         let mut vao = 0;
@@ -104,8 +79,8 @@ impl Colored {
             gl::GenVertexArrays(1, &mut vao);
             gl::LinkProgram(program);
         }
-        let pos = DynamicAttribute::xy(program, "pos", vao).unwrap();
-        let color = DynamicAttribute::rgba(program, "color", vao).unwrap();
+        let pos = DynamicAttribute::xy(program, "pos").unwrap();
+        let color = DynamicAttribute::rgba(program, "color").unwrap();
         Colored {
             vao: vao,
             vertex_shader: vertex_shader,
@@ -125,7 +100,9 @@ impl Colored {
             // Render triangles whether they are facing
             // clockwise or counter clockwise.
             gl::Disable(gl::CULL_FACE);
+            self.color.bind_vao(self.vao);
             self.color.set(&self.color_buffer[..self.offset]);
+            self.pos.bind_vao(self.vao);
             self.pos.set(&self.pos_buffer[..self.offset]);
             gl::DrawArrays(gl::TRIANGLES, 0, self.offset as i32);
             gl::BindVertexArray(0);
@@ -162,39 +139,19 @@ impl Textured {
 
         let src = |bytes| unsafe { ::std::str::from_utf8_unchecked(bytes) };
 
-        let vertex_shader = match if cfg!(target_os = "emscripten") {
-            compile_shader(gl::VERTEX_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(textured::VERTEX_GLSL_120_WEBGL))
-                               .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE_WEBGL))
-                               .get(glsl)
-                               .unwrap())
-        } else {
-            compile_shader(gl::VERTEX_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
-                               .set(GLSL::V1_50, src(textured::VERTEX_GLSL_150_CORE))
-                               .get(glsl)
-                               .unwrap())
-        } {
+        let vertex_shader = match compile_shader(
+            gl::VERTEX_SHADER,                  // shader type
+            Shaders::new().set(GLSL::V1_20, src(textured::VERTEX_GLSL_120))
+                          .get(glsl).unwrap()
+        ) {
             Ok(id) => id,
             Err(s) => panic!("compile_shader: {}", s),
         };
-        let fragment_shader = match if cfg!(target_os = "emscripten") {
-            compile_shader(gl::FRAGMENT_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120_WEBGL))
-                               .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE_WEBGL))
-                               .get(glsl)
-                               .unwrap())
-        } else {
-            compile_shader(gl::FRAGMENT_SHADER,
-                           Shaders::new()
-                               .set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
-                               .set(GLSL::V1_50, src(textured::FRAGMENT_GLSL_150_CORE))
-                               .get(glsl)
-                               .unwrap())
-        } {
+        let fragment_shader = match compile_shader(
+            gl::FRAGMENT_SHADER,                // shader type
+            Shaders::new().set(GLSL::V1_20, src(textured::FRAGMENT_GLSL_120))
+                          .get(glsl).unwrap()
+        ) {
             Ok(id) => id,
             Err(s) => panic!("compile_shader: {}", s),
         };
@@ -204,12 +161,6 @@ impl Textured {
             program = gl::CreateProgram();
             gl::AttachShader(program, vertex_shader);
             gl::AttachShader(program, fragment_shader);
-
-            let c_o_color = CString::new("o_Color").unwrap();
-            if cfg!(not(target_os = "emscripten")) {
-                gl::BindFragDataLocation(program, 0, c_o_color.as_ptr());
-            }
-            drop(c_o_color);
         }
 
         let mut vao = 0;
@@ -217,14 +168,14 @@ impl Textured {
             gl::GenVertexArrays(1, &mut vao);
             gl::LinkProgram(program);
         }
-        let pos = DynamicAttribute::xy(program, "pos", vao).unwrap();
+        let pos = DynamicAttribute::xy(program, "pos").unwrap();
         let c_color = CString::new("color").unwrap();
-        let color = unsafe { gl::GetUniformLocation(program, c_color.as_ptr()) };
+        let color = unsafe {   gl::GetUniformLocation(program, c_color.as_ptr()) };
         drop(c_color);
         if color == -1 {
             panic!("Could not find uniform `color`");
         }
-        let uv = DynamicAttribute::uv(program, "uv", vao).unwrap();
+        let uv = DynamicAttribute::uv(program, "uv").unwrap();
         Textured {
             vao: vao,
             vertex_shader: vertex_shader,
@@ -334,9 +285,6 @@ impl<'a> GlGraphics {
         let (x, y, w, h) = (rect[0], rect[1], rect[2], rect[3]);
         self.viewport(x, y, w, h);
         self.clear_program();
-        unsafe {
-            gl::Enable(gl::FRAMEBUFFER_SRGB);
-        }
         let c = Context::new_viewport(viewport);
         let res = f(c, self);
         if self.colored.offset > 0 {
@@ -432,6 +380,8 @@ impl Graphics for GlGraphics {
 
         let texture = texture.get_id();
         unsafe {
+            shader.pos.bind_vao(shader.vao);
+            shader.uv.bind_vao(shader.vao);
             gl::BindTexture(gl::TEXTURE_2D, texture);
             // Render triangles whether they are facing
             // clockwise or counter clockwise.

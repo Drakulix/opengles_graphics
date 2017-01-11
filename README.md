@@ -1,18 +1,18 @@
-# opengl_graphics [![Build Status](https://travis-ci.org/PistonDevelopers/opengl_graphics.svg)](https://travis-ci.org/PistonDevelopers/opengl_graphics) [![Crates.io](https://img.shields.io/crates/v/piston2d-opengl_graphics.svg)](https://crates.io/crates/piston2d-opengl_graphics) [![Crates.io](https://img.shields.io/crates/l/piston2d-opengl_graphics.svg)](https://github.com/PistonDevelopers/opengl_graphics/blob/master/LICENSE)
+# opengles_graphics [![Build Status](https://travis-ci.org/PistonDevelopers/opengl_graphics.svg)](https://travis-ci.org/Drakulix/opengles_graphics) [![Crates.io](https://img.shields.io/crates/v/opengles_graphics.svg)](https://crates.io/crates/opengles_graphics) [![Crates.io](https://img.shields.io/crates/l/opengles_graphics.svg)](https://github.com/Drakulix/opengles_graphics/blob/master/LICENSE)
 
-An OpenGL 2D back-end for the Piston game engine
+An OpenGL ES 2D back-end for the Piston game engine
 
-Maintainers: @Potpourri, @bvssvni, @mitchmindtree
+Maintainers: @drakulix
+Regulary updated fork of [PistonDevelopers/opengl_graphics](https://github.com/PistonDevelopers/opengl_graphics)
 
 ### Important!
 
-OpenGL needs to load function pointers before use.
+OpenGL ES needs to load function pointers before use.
 If you are experiencing strange error messages like "X not loaded" this is likely the case.
-This is done automatically for you in the SDL2 and GLFW window back-ends for Piston.
-To do this manually, see the README in [gl-rs](https://github.com/bjz/gl-rs)
+To do this, see the README in [gl-rs](https://github.com/bjz/gl-rs)
 
-## Dependencies
 
-![dependencies](./Cargo.png)
+The necessary GL interface is exposed under `opengles_graphics::gl`.
+Currently only supportes GLSL Version 100 & GL ES Version 2.0.
 
-[How to contribute](https://github.com/PistonDevelopers/piston/blob/master/CONTRIBUTING.md)
+### Contributions welcome
